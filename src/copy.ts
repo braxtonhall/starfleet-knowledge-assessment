@@ -218,4 +218,11 @@ export const copy = {
     accessing: "ACCESSING…",
     unableToComply: "UNABLE TO COMPLY",
   },
+
+  authorization: {
+    heading: "ENTER AUTHORIZATION CODE",
+    input: "AUTHORIZATION CODE",
+    submit: "AUTHORIZE",
+    invalid: "AUTHORIZATION CODE REJECTED",
+  },
 } as const;

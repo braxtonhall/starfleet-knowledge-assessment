@@ -1,0 +1,63 @@
+name: publish
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: install node 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: install packages
+        run: npm ci
+
+      - name: test
+        run: npm test
+
+      - name: check questions password
+        env:
+          QUESTIONS_PASSWORD: ${{ secrets.QUESTIONS_PASSWORD }}
+        run: |
+          if [ -z "$QUESTIONS_PASSWORD" ]; then
+            echo "::error::QUESTIONS_PASSWORD is not set. Add it under Settings > Secrets and variables > Actions > Secrets."
+            exit 1
+          fi
+
+      - name: build
+        run: npm run build
+        env:
+          QUESTIONS_PASSWORD: ${{ secrets.QUESTIONS_PASSWORD }}
+
+      - name: upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

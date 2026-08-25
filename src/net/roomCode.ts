@@ -75,6 +75,8 @@ export function joinUrlFor(roomCode: string, base: Location | URL = window.locat
   url.hash = "";
   url.search = "";
   url.searchParams.set(ROOM_QUERY_PARAM, roomCode);
+  const password = typeof localStorage === "undefined" ? null : localStorage.getItem("QUESTIONS_PASSWORD");
+  if (password) url.searchParams.set("pw", password);
   return url.href;
 }
 

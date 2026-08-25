@@ -4,15 +4,14 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "encrypt-questions": "node scripts/encrypt-questions.mjs",
+    "predev": "node scripts/encrypt-questions.mjs",
     "dev": "vite --host",
+    "prebuild": "node scripts/encrypt-questions.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "smoke": "node scripts/smoke.mjs",
-    "shots": "node scripts/shots.mjs",
-    "crew": "node scripts/crew.mjs",
-    "rotation": "node scripts/rotation.mjs"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "puppeteer-core": "^23.11.1",
