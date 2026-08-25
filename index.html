@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Starfleet Knowledge Assessment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23000'/%3E%3Ccircle cx='78' cy='22' r='14' fill='%23eb943a'/%3E%3Crect x='6' y='30' width='56' height='16' fill='%23889'/%3E%3Crect x='6' y='54' width='40' height='16' fill='%23889'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" type="text/css" href="lcars-assets/classic.css" />
+</head>
+<body>
+  <audio id="audio1" src="lcars-assets/audio/beep1.mp3" preload="auto"></audio>
+  <audio id="audio2" src="lcars-assets/audio/beep2.mp3" preload="auto"></audio>
+  <audio id="audio3" src="lcars-assets/audio/beep3.mp3" preload="auto"></audio>
+  <audio id="audio4" src="lcars-assets/audio/beep4.mp3" preload="auto"></audio>
+  <audio id="audio5" src="lcars-assets/audio/beep5.mp3" preload="auto"></audio>
+
+  <section class="wrap-standard" id="column-3">
+    <div class="wrap">
+      <!-- Decorative frame: divs, not buttons, so nothing here invites a click
+           that does nothing. -->
+      <div class="left-frame-top" aria-hidden="true">
+        <div class="panel-1 deco-panel">STARFLEET<span class="hop">&nbsp;56844</span></div>
+        <div class="panel-2 deco-panel">02<span class="hop">-262000</span></div>
+      </div>
+
+      <div class="right-frame-top">
+        <!-- On a player device this is taken over by that player's designation,
+             so the name they answer under is never off screen (see lcars.ts). -->
+        <div class="banner" id="banner">STARFLEET KNOWLEDGE ASSESSMENT &middot; 56844</div>
+        <div class="data-cascade-button-group">
+          <div class="data-cascade-wrapper" id="frozen" aria-hidden="true">
+            <div class="data-column"><div class="dc-row-1">93</div><div class="dc-row-1">1853</div><div class="dc-row-2">24109</div><div class="dc-row-3">7</div><div class="dc-row-3">7024</div><div class="dc-row-4">322</div><div class="dc-row-5">4149</div><div class="dc-row-6">86</div><div class="dc-row-7">05</div></div>
+            <div class="data-column"><div class="dc-row-1">21509</div><div class="dc-row-1">68417</div><div class="dc-row-2">80</div><div class="dc-row-3">2048</div><div class="dc-row-3">319825</div><div class="dc-row-4">46233</div><div class="dc-row-5">05</div><div class="dc-row-6">2014</div><div class="dc-row-7">30986</div></div>
+            <div class="data-column"><div class="dc-row-1">585101</div><div class="dc-row-1">25403</div><div class="dc-row-2">31219</div><div class="dc-row-3">752</div><div class="dc-row-3">0000</div><div class="dc-row-4">21048</div><div class="dc-row-5">293612</div><div class="dc-row-6">534082</div><div class="dc-row-7">206</div></div>
+            <div class="data-column"><div class="dc-row-1">2107853</div><div class="dc-row-1">12201972</div><div class="dc-row-2">24487255</div><div class="dc-row-3">30412</div><div class="dc-row-3">98</div><div class="dc-row-4">4024161</div><div class="dc-row-5">888</div><div class="dc-row-6">35045462</div><div class="dc-row-7">41520257</div></div>
+          </div>
+          <!-- Live readouts, not buttons: the left frame already owns navigation. -->
+          <nav class="status-readouts" aria-label="Assessment status">
+            <div class="nav-1 nav-readout"><span class="nav-readout-label">Confirmed</span><span class="nav-readout-value" id="stat-correct">0</span></div>
+            <div class="nav-2 nav-readout"><span class="nav-readout-label">Incorrect</span><span class="nav-readout-value" id="stat-incorrect">0</span></div>
+            <div class="nav-3 nav-readout"><span class="nav-readout-label">Unlogged</span><span class="nav-readout-value" id="stat-unanswered">0</span></div>
+            <div class="nav-4 nav-readout"><span class="nav-readout-label">Archive</span><span class="nav-readout-value" id="stat-total">0</span></div>
+          </nav>
+        </div>
+        <div class="floor-text">STARFLEET KNOWLEDGE NETWORK AVAILABLE</div>
+        <div class="bar-panel first-bar-panel" aria-hidden="true">
+          <div class="bar-1"></div><div class="bar-2"></div><div class="bar-3"></div>
+          <div class="bar-4"></div><div class="bar-5"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap" id="gap">
+      <div class="left-frame">
+        <div>
+          <!-- Solo-only shortcuts. On the landing screen they fall back to the
+               decorative label so the frame keeps its shape without offering a
+               route past the two top-level choices (spec §2). -->
+          <button type="button" class="panel-3 rail-nav" id="nav-drill">
+            <span class="rail-label">QUICK DRILL<span class="hop">&nbsp;10-20-50</span></span>
+            <span class="rail-idle" aria-hidden="true">03<span class="hop">-111968</span></span>
+          </button>
+          <button type="button" class="panel-4 rail-nav" id="nav-database">
+            <span class="rail-label">DATABASE<span class="hop">&nbsp;2700</span></span>
+            <span class="rail-idle" aria-hidden="true">04<span class="hop">-041969</span></span>
+          </button>
+          <button type="button" class="panel-5 rail-nav" id="nav-systems">
+            <span class="rail-label">SYSTEMS</span>
+            <span class="rail-idle" aria-hidden="true">05<span class="hop">-1701D</span></span>
+          </button>
+          <div class="panel-6 deco-panel" aria-hidden="true">06<span class="hop">-071984</span></div>
+          <div class="panel-spacer" aria-hidden="true"></div>
+        </div>
+        <div>
+          <!-- Ending a session you have not started is a no-op, so on the
+               landing screen this falls back to the decorative label like the
+               rail shortcuts above it. -->
+          <button type="button" class="panel-7 rail-nav" id="nav-end">
+            <span class="rail-label">END SESSION</span>
+            <span class="rail-idle" aria-hidden="true">07<span class="hop">-032364</span></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="right-frame">
+        <div class="bar-panel" aria-hidden="true">
+          <div class="bar-6"></div><div class="bar-7"></div><div class="bar-8"></div>
+          <div class="bar-9"></div><div class="bar-10"></div>
+        </div>
+        <main id="app"></main>
+        <footer class="site-footer">
+          <p class="attribution">
+            LCARS interface framework &mdash;
+            <a href="https://www.thelcars.com/" target="_blank" rel="noopener noreferrer">TheLCARS.com</a>
+            (v26) by Jim Robertus. Used with thanks.
+          </p>
+          <p class="attribution attribution--muted">
+            Star Trek and LCARS are trademarks of CBS Studios Inc. / Paramount.
+            This is an unofficial, non-commercial fan project.
+          </p>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="/src/main.ts"></script>
+  <div class="headtrim"></div>
+  <div class="baseboard"></div>
+</body>
+</html>

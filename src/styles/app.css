@@ -1,0 +1,1597 @@
+/* An author-level `display` (e.g. `.lcars-action { display: inline-flex }`)
+   outranks the UA stylesheet's `[hidden] { display: none }`, which left the
+   PROCEED button on screen before a question was answered. */
+[hidden] {
+  display: none !important;
+}
+
+/* ===== LCARS chrome overrides =====
+   The framework animates panel-1, nav-1/2/4 and the data cascade. Constant
+   motion in the header is distracting while answering, so the ornament holds
+   still and the whole top row collapses during play. */
+.panel-1,
+.nav-1,
+.nav-2,
+.nav-4 {
+  animation: none;
+}
+
+/* classic.css ships no `.floor-text` rule (nemesis-blue.css does), so the status
+   line falls back to an unstyled full-width block — left-aligned and butted
+   against the left frame. Adopt the treatment the framework uses in its other
+   theme: right-aligned, like the banner it sits under. */
+.floor-text {
+  padding-top: 0.6rem;
+  padding-left: clamp(20px, 3vw, 50px);
+  text-align: right;
+  font-size: clamp(0.9rem, 2vw, 1.25rem);
+}
+
+/* Decorative frame pieces are divs; the framework only sizes buttons. */
+.deco-panel {
+  width: var(--lfw);
+  text-align: right;
+  cursor: default;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* classic.css brightens the bar panels via `body:has(.panel-2:hover)` and
+   `body:has(.panel-3:hover)`. Nothing decorative or disabled should light up
+   the frame as if it were about to do something. */
+body:has(.panel-2.deco-panel:hover) .bar-1,
+body:has(.panel-2.deco-panel:hover) .right-frame-top::before,
+body:has(.panel-2.deco-panel:active) .bar-1,
+body:has(.panel-2.deco-panel:active) .right-frame-top::before,
+body:has(.panel-3.rail-nav:disabled:hover) .bar-6,
+body:has(.panel-3.rail-nav:disabled:hover) .right-frame::before,
+body:has(.panel-3.rail-nav:disabled:active) .bar-6,
+body:has(.panel-3.rail-nav:disabled:active) .right-frame::before {
+  filter: none;
+}
+
+/* Status readouts occupy the old nav-button slots without being clickable. */
+.status-readouts .nav-readout {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: var(--nav-width);
+  height: calc(var(--nav-width) / 2.8);
+  padding-inline: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-radius: 100vmax;
+  text-align: right;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: black;
+  user-select: none;
+}
+
+.nav-readout-label {
+  font-size: 0.7rem;
+  font-weight: normal;
+  opacity: 0.75;
+}
+
+.nav-readout-value {
+  font-size: 1.15rem;
+  font-weight: bold;
+}
+
+@media (width <= 1300px) {
+  .nav-readout-value {
+    font-size: 1rem;
+  }
+}
+
+/* Left-frame shortcuts: decorative until the player is inside Solo Simulation. */
+.rail-idle {
+  display: none;
+}
+
+.rail-nav:disabled .rail-label {
+  display: none;
+}
+
+.rail-nav:disabled .rail-idle {
+  display: inline;
+}
+
+.rail-nav:disabled {
+  cursor: default;
+  filter: none;
+}
+
+/* Compact chrome: everything past the landing screen. The full-height banner,
+   data cascade and network line are the title screen's flourish — once you're
+   working, they're just a screenful of ornament above the content. */
+body.mode-compact .data-cascade-button-group,
+body.mode-compact .floor-text {
+  display: none;
+}
+
+body.mode-compact .banner {
+  font-size: clamp(1rem, 0.6rem + 1.4vw, 1.6rem);
+  padding-bottom: 0.25rem;
+}
+
+/* A player's designation takes the banner's place on their own device. It keeps
+   the compact banner's size but takes the orange the rest of the crew screens
+   use for a designation, so it reads as "you" rather than as a title. Names are
+   short, so it stays on one line even at the compact size. */
+.banner--designation {
+  color: var(--orange);
+  letter-spacing: 0.04em;
+}
+
+body.mode-compact .banner--designation {
+  font-size: clamp(1.15rem, 0.7rem + 1.7vw, 2rem);
+}
+
+/* Compact chrome drops panel-1 entirely. Its label is pure ornament, and at any
+   height it leaves a second colour block stacked above the elbow that has to be
+   kept in line with .right-frame-top by hand — a fight, since the two sides are
+   sized by unrelated content. Removing it lets panel-2 (`flex-grow: 1`, and
+   carrying the same --radius-top as the frame) fill the whole left-frame-top, so
+   the elbow *is* the frame's own shape and lines up by construction. */
+body.mode-compact .left-frame-top .panel-1 {
+  display: none;
+}
+
+/* Play trims further: the question owns the screen. Attribution stays visible
+   on every other screen. */
+body.mode-play .site-footer {
+  display: none;
+}
+/* NB: #gap keeps its margin — the space between the header and content rows is
+   part of the LCARS frame, not padding to reclaim. */
+
+/* ===== Screen headings ===== */
+.screen-heading {
+  margin-block: 0.5rem 1.25rem;
+}
+
+/* ===== Footer / attribution ===== */
+.site-footer {
+  margin-top: 3rem;
+  color: var(--lilac);
+  line-height: 1.5;
+}
+
+.attribution {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+}
+
+.attribution a {
+  color: var(--orange);
+}
+
+.attribution--muted {
+  opacity: 0.65;
+}
+
+/* ===== Virtual list ===== */
+.vl-viewport {
+  position: relative;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vl-spacer {
+  position: relative;
+  width: 100%;
+}
+
+.vl-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  will-change: transform;
+}
+
+/* ===== Browse rows ===== */
+.qrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid #222;
+  border-left: 0.35rem solid var(--lilac);
+  overflow: hidden;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.qrow:hover {
+  background-color: #161616;
+}
+
+.qrow--correct {
+  border-left-color: var(--bluey);
+}
+
+.qrow--incorrect {
+  border-left-color: var(--mars);
+}
+
+.qrow--unanswered {
+  border-left-color: var(--lilac);
+}
+
+.qrow-num {
+  flex: 0 0 auto;
+  color: var(--orange);
+  font-weight: bold;
+  letter-spacing: 0.03em;
+}
+
+.qrow--correct .qrow-num { color: var(--bluey); }
+.qrow--incorrect .qrow-num { color: var(--mars); }
+
+.qrow-text {
+  flex: 1 1 auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.2;
+}
+
+.qrow-badge {
+  flex: 0 0 auto;
+  color: var(--barley);
+  font-size: 0.8rem;
+}
+
+/* ===== Answer options ===== */
+.answer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-block: 1.25rem;
+}
+
+.answer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.75rem 1.25rem;
+  border: 0;
+  border-radius: 100vmax;
+  background-color: var(--african-violet);
+  color: black;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* Plan §5.5: four options, each in a distinct colour. Deliberately avoids
+   `bluey` and `mars` — those are reserved for correct/incorrect (§6.2). */
+.answer:nth-child(1) { background-color: var(--african-violet); }
+.answer:nth-child(2) { background-color: var(--true-mauve); }
+.answer:nth-child(3) { background-color: var(--almond); }
+.answer:nth-child(4) { background-color: var(--barley); }
+
+.answer:hover {
+  filter: brightness(115%);
+  color: black;
+}
+
+.answer-letter {
+  flex: 0 0 auto;
+  font-weight: bold;
+}
+
+.answer-text {
+  flex: 1 1 auto;
+  line-height: 1.25;
+}
+
+.answer--correct,
+.answer--correct:nth-child(n) {
+  background-color: var(--bluey);
+  color: black;
+}
+
+.answer--wrong,
+.answer--wrong:nth-child(n) {
+  background-color: var(--mars);
+  color: white;
+}
+
+.answer--dim {
+  opacity: 0.35;
+}
+
+.answer:disabled {
+  cursor: default;
+}
+
+/* ===== Modal ===== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-panel {
+  width: min(40rem, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: #050505;
+  border: 2px solid var(--orange);
+  border-radius: 1.5rem 0 1.5rem 0;
+  padding: 1.5rem;
+}
+
+.modal-panel--detail {
+  width: min(44rem, 100%);
+}
+
+.modal-message {
+  text-transform: uppercase;
+  font-size: 1.1rem;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Verdict left, dismiss right — matching the play screen footer. Without
+   `align-items: center` the button stretches to the banner's height plus its
+   margin, which is how CLOSE ended up a 96px blob. */
+.modal-actions .status-banner {
+  flex: 0 1 auto;
+  margin-block: 0;
+  margin-right: auto;
+}
+
+/* ===== Detail view ===== */
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-item {
+  color: var(--orange);
+  font-weight: bold;
+}
+
+.detail-discipline {
+  color: var(--lilac);
+  text-align: right;
+}
+
+.detail-question {
+  font-size: clamp(1.15rem, 1.05rem + 1vw, 1.5rem);
+  line-height: 1.3;
+}
+
+/* ===== Chips ===== */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-block: 1rem;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4rem;
+  min-height: 3rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 100vmax;
+  background-color: var(--lilac);
+  color: black;
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.chip--selected {
+  background-color: var(--orange);
+}
+
+.chip--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.chip-label {
+  font-size: 1.1rem;
+}
+
+/* ===== Toggle ===== */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block: 0.75rem;
+}
+
+.toggle-label {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.toggle-btn {
+  min-width: 4rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.25rem;
+  border: 0;
+  border-radius: 100vmax;
+  background-color: var(--dirty-mauve);
+  color: black;
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.toggle-btn--on {
+  background-color: var(--bluey);
+}
+
+/* ===== Accordion (disc-*) =====
+   Deliberately NOT named `.accordion` — the LCARS framework owns that class and
+   its `display:flex` + `max-height:0` rules collapsed these panels. */
+.disc {
+  margin-block: 0.4rem;
+}
+
+.disc-header {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 2.75rem 0.6rem 1.25rem;
+  border: 0;
+  border-left: solid 1.5rem var(--subdued-sienna);
+  border-radius: 100vmax;
+  background-color: var(--butterscotch);
+  color: black;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.disc-header:hover {
+  background-color: var(--red);
+  border-left-color: var(--almond-creme);
+  color: black;
+  filter: none;
+}
+
+.disc-header::after {
+  content: "\276F";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  transition: transform 0.25s ease;
+  font-weight: bold;
+}
+
+.disc--open > .disc-header {
+  background-color: var(--orange);
+}
+
+.disc--open > .disc-header::after {
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.disc-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+  width: 100%;
+}
+
+.disc-title-count {
+  flex: 0 0 auto;
+  color: var(--african-violet);
+  background-color: black;
+  padding: 0.1rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.disc-panel {
+  display: none;
+}
+
+.disc--open > .disc-panel {
+  display: block;
+  margin-top: 0.4rem;
+  border-left: 0.35rem solid var(--butterscotch);
+  background-color: #060606;
+}
+
+/* Scrolling variant: a bounded viewport the virtual list can window against. */
+.disc--open > .disc-panel--list {
+  height: clamp(16rem, 52vh, 40rem);
+}
+
+/* ===== Primary actions ===== */
+.lcars-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 2rem;
+  border: 0;
+  border-radius: 100vmax;
+  background-color: var(--butterscotch);
+  color: black;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.lcars-action:hover {
+  filter: brightness(115%);
+}
+
+.lcars-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lcars-action--wide {
+  width: 100%;
+  max-width: 30rem;
+  min-height: 3.5rem;
+  font-size: 1.2rem;
+}
+
+.lcars-action--small {
+  padding: 0.4rem 1rem;
+  min-height: 2.5rem;
+  font-size: 0.85rem;
+}
+
+.lcars-action--muted {
+  background-color: var(--lilac);
+}
+
+/* ===== Rail active state ===== */
+.rail-active {
+  filter: brightness(140%) saturate(120%);
+}
+
+/* panel-3, the .right-frame::before elbow and bar-6 are all --red and read as
+   one continuous shape. Any lighting has to cover all three or the elbow looks
+   snapped in half. One variable drives every state so hover and active can't
+   drift apart — the framework brightens the panel and the bar through separate
+   rules, which is how they got out of step. */
+body {
+  --elbow-filter: none;
+}
+
+body:has(#nav-drill:enabled:hover) {
+  --elbow-filter: brightness(115%);
+}
+
+body:has(#nav-drill.rail-active) {
+  --elbow-filter: brightness(140%) saturate(120%);
+}
+
+body:has(#nav-drill.rail-active:enabled:hover) {
+  --elbow-filter: brightness(160%) saturate(120%);
+}
+
+button#nav-drill,
+button#nav-drill:hover,
+body:has(#nav-drill) .bar-6,
+body:has(#nav-drill) .right-frame::before {
+  filter: var(--elbow-filter);
+}
+
+/* ===== Landing ===== */
+.landing-sub {
+  margin-top: -1rem;
+}
+
+.landing-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.landing-choice {
+  flex: 1 1 280px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem;
+  border: 0;
+  border-radius: 2rem 0 2rem 0;
+  text-align: right;
+  cursor: pointer;
+  color: black;
+  text-transform: uppercase;
+  font-family: inherit;
+}
+
+.landing-choice--solo {
+  background-color: var(--butterscotch);
+}
+
+.landing-choice--crew {
+  background-color: var(--bluey);
+}
+
+/* Duty Rotation is the odd one out on the crew screen — the two above it are
+   the pair that need a network, and they should keep reading as a pair. */
+.landing-choice--rotation {
+  background-color: var(--african-violet);
+}
+
+.landing-choice-title {
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+.landing-choice-sub {
+  font-size: 0.85rem;
+}
+
+/* ===== Hub ===== */
+.hub-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  max-width: 34rem;
+}
+
+.hub-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 0;
+  border-radius: 0 1.5rem 1.5rem 0;
+  background-color: var(--african-violet);
+  color: black;
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.hub-entry:nth-child(2) {
+  background-color: var(--butterscotch);
+}
+
+.hub-entry:nth-child(3) {
+  background-color: var(--barley);
+}
+
+.hub-entry-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.hub-entry-sub {
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+/* ===== Config ===== */
+.config-form {
+  max-width: 40rem;
+}
+
+.config-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.config-pool {
+  text-transform: uppercase;
+  color: var(--orange);
+  letter-spacing: 0.03em;
+}
+
+/* ===== Category filter ===== */
+.category-filter-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 40vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.category-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-bottom: 1px solid #222;
+  background: transparent;
+  color: var(--font-color);
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+/* The framework's `button:hover { color: black }` would erase this text against
+   the black panel, so state the hover colours explicitly. */
+.category-row:hover,
+.category-row:focus-visible {
+  background-color: #1a1a1a;
+  color: var(--orange);
+  filter: none;
+}
+
+.category-row:hover .category-count,
+.category-row:focus-visible .category-count {
+  color: var(--orange);
+}
+
+.category-check {
+  color: var(--orange);
+}
+
+.category-row[aria-pressed="false"] .category-check {
+  color: var(--lilac);
+}
+
+.category-title {
+  flex: 1 1 auto;
+}
+
+.category-count {
+  color: var(--lilac);
+  font-size: 0.8rem;
+}
+
+/* ===== Play ===== */
+.play {
+  max-width: 46rem;
+}
+
+.play-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.play-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.play-progress {
+  color: var(--orange);
+  font-weight: bold;
+  letter-spacing: 0.04em;
+}
+
+.play-discipline {
+  color: var(--lilac);
+  text-align: left;
+}
+
+.play-quit {
+  border: 0;
+  border-radius: 100vmax;
+  background-color: var(--red);
+  color: black;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+  font-weight: bold;
+  min-height: 2.5rem;
+}
+
+.play-timer {
+  text-align: right;
+  margin-bottom: 0.5rem;
+}
+
+.play-timer-value {
+  font-size: 2.5rem;
+  color: var(--orange);
+  font-weight: bold;
+  line-height: 1;
+}
+
+.play-timer--low .play-timer-value {
+  color: var(--mars);
+  animation: blink 1s step-start infinite;
+}
+
+.play-question {
+  font-size: clamp(1.2rem, 1.05rem + 1.4vw, 1.8rem);
+  line-height: 1.3;
+  color: var(--font-color);
+}
+
+.play-options {
+  margin-top: 0.5rem;
+}
+
+/* Verdict left, advance button right, both below the options. */
+.play-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+.play-footer .status-banner {
+  flex: 1 1 14rem;
+  margin-block: 0;
+}
+
+.play-footer .lcars-action {
+  flex: 0 0 auto;
+  margin-left: auto;
+  min-width: 12rem;
+  min-height: 3.25rem;
+}
+
+/* SKIP is a quieter action than PROCEED — it advances without an answer. */
+.lcars-action--answered {
+  background-color: var(--butterscotch);
+}
+
+.play-footer .lcars-action:not(.lcars-action--answered) {
+  background-color: var(--lilac);
+}
+
+/* ===== Feature / supplemental ===== */
+.feature-panel {
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  margin-block: 1.5rem;
+  background-color: #0c0c0c;
+  border-left: 0.5rem solid var(--barley);
+}
+
+.feature-heading {
+  color: var(--barley);
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.feature-text {
+  color: #dddddd;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ===== Status banners ===== */
+.status-banner {
+  margin-block: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 1rem 1rem 0;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+}
+
+.status-banner--correct {
+  background-color: var(--bluey);
+  color: black;
+}
+
+.status-banner--incorrect {
+  background-color: var(--mars);
+  color: white;
+}
+
+/* ===== Results ===== */
+.results-rating {
+  font-size: clamp(1.4rem, 1.2rem + 1.5vw, 2.2rem);
+  color: var(--orange);
+}
+
+.results-bonus {
+  color: var(--barley);
+  margin-top: -1rem;
+}
+
+.results-record {
+  margin-top: 1rem;
+}
+
+.results-review-heading {
+  margin-top: 2.5rem;
+}
+
+.results-clean {
+  color: var(--bluey);
+  text-transform: uppercase;
+}
+
+/* Review list leads with the question — the item you got wrong — and carries
+   the correct response as supporting detail underneath. */
+.results-missed li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 1rem;
+  line-height: 1.35;
+  margin-bottom: 1.1rem;
+}
+
+.results-missed-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  color: var(--orange);
+  font-weight: bold;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+
+.results-missed-tag {
+  color: var(--lilac);
+  font-weight: normal;
+}
+
+.results-missed-question {
+  color: var(--font-color);
+}
+
+
+/* ===== Browse ===== */
+.browse-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-block: 1rem;
+}
+
+.browse-search {
+  flex: 1 1 18rem;
+  width: 100%;
+  max-width: 40rem;
+  min-height: 3rem;
+  padding: 0.5rem 1.25rem;
+  border: 0;
+  border-radius: 100vmax;
+  background-color: #0c0c0c;
+  border: 2px solid var(--orange);
+  color: var(--font-color);
+  font-family: inherit;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.browse-search::placeholder {
+  color: var(--lilac);
+  opacity: 0.7;
+}
+
+.browse-counters {
+  display: flex;
+  gap: 1rem;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.counter {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.counter--correct {
+  color: var(--bluey);
+}
+
+.counter--incorrect {
+  color: var(--mars);
+}
+
+.browse-search-results {
+  height: clamp(18rem, 58vh, 44rem);
+  border-left: 0.35rem solid var(--butterscotch);
+  background-color: #060606;
+}
+
+.browse-empty {
+  padding: 1.5rem;
+  text-transform: uppercase;
+  color: var(--lilac);
+}
+
+/* ===== Options ===== */
+.options-stats {
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.options-block {
+  margin-block: 1.5rem;
+}
+
+.options-categories {
+  margin-top: 2.5rem;
+}
+
+.options-category-list {
+  max-width: 44rem;
+}
+
+.options-category-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #222;
+}
+
+.options-category-title {
+  flex: 1 1 auto;
+  text-transform: uppercase;
+}
+
+.options-category-count {
+  color: var(--lilac);
+}
+
+/* ===== Mobile ===== */
+@media (width <= 640px) {
+  .landing-choice {
+    min-height: 140px;
+  }
+
+  .landing-choice-title {
+    font-size: 1.5rem;
+  }
+
+  .answer {
+    min-height: 3rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.9rem;
+  }
+
+  .answer-letter {
+    align-self: flex-start;
+  }
+
+  .modal-panel {
+    padding: 1rem;
+    border-radius: 1rem 0 1rem 0;
+  }
+
+  .disc--open > .disc-panel--list,
+  .browse-search-results {
+    height: 60vh;
+  }
+
+  .browse-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* The toolbar's main axis is vertical here, so the search field's flex-basis
+     would be read as a height. Pin it back to its natural size. */
+  .browse-toolbar .browse-search {
+    flex: 0 0 auto;
+  }
+
+  .play-timer-value {
+    font-size: 2rem;
+  }
+}
+
+/* ===== Crew Drill (multiplayer) ===== */
+.crew-status,
+.crew-join,
+.crew-recap,
+.crew-standings {
+  max-width: 44rem;
+}
+
+.crew-status p {
+  margin-block: 0.75rem;
+}
+
+.crew-hint {
+  font-size: 0.85rem;
+  color: var(--lilac);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.crew-error-detail {
+  color: var(--mars);
+  overflow-wrap: anywhere;
+}
+
+/* ----- Ready room ----- */
+.crew-lobby {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1400px;
+  /* What decides the column count is how much room the content area has, not the
+     window: the LCARS left frame takes a fixed 240px out of every viewport, so a
+     media query would break the layout at the wrong widths. */
+  container-type: inline-size;
+}
+
+.crew-lobby-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+/* Code and roster sit side by side when the column can take both, and the
+   roster drops underneath when it cannot. Plain flex wrapping decides that from
+   the real measurements, so there is no breakpoint to keep in sync. */
+.crew-lobby-join {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.crew-lobby-join .crew-coordinates {
+  flex: 0 0 auto;
+  width: min(100%, 280px);
+}
+
+.crew-lobby-join .crew-roster-panel {
+  flex: 1 1 9rem;
+  min-width: 0;
+}
+
+/* A full room (16) must not push ENGAGE below the fold. */
+.crew-lobby-join .roster {
+  max-height: 44vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@container (min-width: 900px) {
+  /* Not an even split: the configuration column holds one stack of controls,
+     while the joining side has to fit a scannable code and a roster beside it. */
+  .crew-lobby-grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    /* Columns are independent; the shorter one should not stretch to match. */
+    align-items: start;
+  }
+
+  /* Configuration on the left, joining information on the right. The DOM order is
+     the reverse so the stacked layout leads with the QR. */
+  .crew-lobby-config {
+    order: -1;
+  }
+}
+
+.crew-coordinates h3,
+.crew-roster-panel h3 {
+  display: flex;
+  align-items: baseline;
+  /* The count belongs beside the title, not flung to the far edge of a column. */
+  gap: 0.6rem;
+  color: var(--orange);
+}
+
+.room-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.room-input {
+  flex: 1 1 9rem;
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0.5rem 1.25rem;
+  border: 2px solid var(--orange);
+  border-radius: 100vmax;
+  background-color: #000;
+  color: var(--almond-creme);
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.room-input:focus-visible {
+  outline: 2px solid var(--bluey);
+  outline-offset: 2px;
+}
+
+.crew-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.crew-copy-note {
+  color: var(--bluey);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+
+/* ----- Transport coordinates (QR) ----- */
+.qr-panel {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 22rem;
+  width: 100%;
+}
+
+/* The LCARS elbow: the code sits in a peach panel, capped by an orange bar
+   carrying the designation. */
+.qr-frame {
+  background-color: var(--almond-creme);
+  border-radius: 1.5rem 1.5rem 0 0;
+  padding: 0.75rem;
+  line-height: 0;
+}
+
+.qr-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Dark-on-light, not inverted: decoders expect it, and the peach field keeps it
+   in the LCARS palette anyway. */
+.qr-field { fill: var(--almond-creme); }
+.qr-module,
+.qr-finder-core { fill: #000; }
+.qr-finder { stroke: #000; }
+
+.qr-caption {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--orange);
+  color: #000;
+  border-radius: 0 0 1.5rem 1.5rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+/* Editing the room name happens in the caption itself rather than in a second
+   field repeating it below. */
+.qr-caption--input {
+  border: 0;
+  font-family: inherit;
+  cursor: text;
+}
+
+.qr-caption--input:focus-visible {
+  outline: 2px solid var(--bluey);
+  outline-offset: -3px;
+}
+
+/* Secondary to the code above it, and sized accordingly. */
+.lcars-action--small {
+  min-height: 2.25rem;
+  padding: 0.35rem 1.1rem;
+  font-size: 0.8rem;
+}
+
+/* ----- Crew roster ----- */
+.crew-roster-heading {
+  color: var(--orange);
+  margin-bottom: 0.5rem;
+}
+
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.roster-empty {
+  color: var(--lilac);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.6rem 0;
+}
+
+.roster-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #222;
+  border-radius: 0.35rem 0 0 0.35rem;
+}
+
+.roster-row--gone {
+  opacity: 0.45;
+}
+
+.roster-dot {
+  color: var(--bluey);
+  font-size: 0.9rem;
+  width: 1rem;
+  text-align: center;
+}
+
+.roster-name {
+  flex: 1 1 auto;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  overflow-wrap: anywhere;
+}
+
+.roster-tag {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--lilac);
+}
+
+.roster-tag--waiting { color: var(--barley); }
+.roster-tag--in { color: var(--bluey); }
+.roster-tag--command { color: var(--orange); }
+
+/* The reader's own row, on a list of the whole room. Marked on the rail edge
+   rather than by recolouring the text, which is already carrying the verdict. */
+.roster-row--you {
+  border-left: 4px solid var(--orange);
+  padding-left: 0.5rem;
+}
+
+.roster-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  border-radius: 100vmax;
+  background-color: var(--lilac);
+  color: #000;
+  font-weight: bold;
+}
+
+.roster-choice--correct { background-color: var(--bluey); }
+.roster-choice--wrong { background-color: var(--mars); color: #fff; }
+
+.roster-row--standing {
+  padding-block: 0.75rem;
+}
+
+.roster-rank {
+  color: var(--orange);
+  font-weight: bold;
+  min-width: 2rem;
+}
+
+.roster-score {
+  color: var(--orange);
+  font-size: 1.5rem;
+  font-weight: bold;
+  min-width: 3rem;
+  text-align: right;
+}
+
+/* The winner leads the list, so it earns the emphasis. */
+.roster-row--standing:first-child .roster-score,
+.roster-row--standing:first-child .roster-name {
+  color: var(--almond-creme);
+}
+
+/* ----- Final standings ----- */
+.standings-verdict {
+  color: var(--orange);
+  font-size: 1.35rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+/* On a player device the standings are one section among several, so they get
+   a rule to sit against rather than owning the screen the way they do on a
+   host display that shows nothing else. */
+.crew-recap .standings {
+  margin-bottom: 1.5rem;
+}
+
+/* ----- The host's seat ----- */
+.host-seat {
+  border-bottom: 2px solid var(--dirty-mauve);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.host-seat .toggle-row {
+  margin-top: 0;
+}
+
+.host-seat .crew-hint {
+  margin-top: 0.35rem;
+}
+
+/* ----- Shared drill display ----- */
+.crew-play .crew-roster-panel {
+  margin-top: 1.5rem;
+}
+
+/* The host shows the options for the room to read, but they are not a control
+   surface — nothing here is clickable. */
+.answer-list--readonly .answer {
+  cursor: default;
+}
+
+.answer--chosen {
+  outline: 3px solid var(--orange);
+  outline-offset: -3px;
+}
+
+/* ===== Duty Rotation ===== */
+.rotation-config,
+.rotation-watchbill,
+.rotation-standings {
+  max-width: 44rem;
+}
+
+/* Crew size heads the panel the way the host seat does in the ready room: it
+   decides how much the drill deals before any control below it matters. */
+.rotation-officers {
+  border-bottom: 2px solid var(--dirty-mauve);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.rotation-officers h3 {
+  margin-top: 0;
+}
+
+/* A drill that cannot be dealt says so where the item count would have been. */
+.config-pool--short {
+  color: var(--mars);
+}
+
+.rotation-bill {
+  margin-top: 1.5rem;
+}
+
+.rotation-bill .roster-rank {
+  min-width: 2.5rem;
+}
+
+/* ----- Hand-off ----- */
+/* Full-screen and deliberately empty: the previous turn's DOM is gone by the
+   time this renders, so there is nothing behind it to scroll back to. */
+.rotation-handoff {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 1.5rem;
+  min-height: 55vh;
+  max-width: 46rem;
+}
+
+.rotation-handoff .play-top {
+  margin-bottom: 0;
+}
+
+.rotation-previous {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: bold;
+}
+
+.rotation-previous--correct {
+  color: var(--bluey);
+}
+
+.rotation-previous--incorrect {
+  color: var(--mars);
+}
+
+.rotation-conn {
+  margin: 0;
+  color: var(--orange);
+  font-size: clamp(1.8rem, 1.4rem + 3vw, 3.2rem);
+  line-height: 1.05;
+}
+
+/* The one thing to do on this screen, sized so it is found without looking. */
+.rotation-take {
+  min-height: 5rem;
+  font-size: 1.4rem;
+}
+
+/* ----- Standings ----- */
+.roster-tag--tally {
+  color: var(--orange);
+  font-variant-numeric: tabular-nums;
+}
+
+.rotation-reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+@media (width <= 640px) {
+  .qr-panel {
+    max-width: 100%;
+  }
+
+  .room-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
