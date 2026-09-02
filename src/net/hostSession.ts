@@ -799,6 +799,7 @@ export function createHostSession(options: {
     },
 
     destroy() {
+      transport?.broadcast({ type: "disbanded" });
       listeners.clear();
       stopTicking();
       stopPinging();

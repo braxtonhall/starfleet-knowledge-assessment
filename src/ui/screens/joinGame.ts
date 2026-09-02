@@ -43,6 +43,7 @@ function keyFor(state: PlayerState): ViewKey {
     case "reveal":
       return "play";
     case "rejected":
+    case "disbanded":
     case "lost":
       return "blocked";
     default:
@@ -403,6 +404,7 @@ const REJECTION_COPY: Record<RejectReason, string> = {
 };
 
 function blockedView(ctx: AppContext, session: PlayerSession): PlayerView {
+  const heading = screenHeading(copy.crew.linkLost);
   const message = h("p", { className: "crew-error-detail" });
   const retry = h("button", {
     type: "button",
@@ -413,7 +415,7 @@ function blockedView(ctx: AppContext, session: PlayerSession): PlayerView {
   const root = h(
     "div",
     { className: "crew-status" },
-    screenHeading(copy.crew.linkLost),
+    heading,
     message,
     h(
       "div",
@@ -438,8 +440,14 @@ function blockedView(ctx: AppContext, session: PlayerSession): PlayerView {
         return;
       }
       retry.hidden = false;
-      message.textContent =
-        state.errorKind === "missing" ? copy.crew.roomMissing : copy.crew.linkLost;
+      const disbanded = state.phase === "disbanded";
+      heading.textContent = disbanded ? copy.crew.disbanded : copy.crew.linkLost;
+      retry.hidden = disbanded;
+      message.textContent = disbanded
+        ? copy.crew.disbandedDetail
+        : state.errorKind === "missing"
+          ? copy.crew.roomMissing
+          : copy.crew.linkLost;
     },
   };
 }

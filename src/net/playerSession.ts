@@ -27,6 +27,7 @@ export type PlayerPhase =
   | "reveal"
   | "over"
   | "rejected"
+  | "disbanded"
   | "lost";
 
 const RETRY_DELAY_MS = 1500;
@@ -220,6 +221,16 @@ export function createPlayerSession(options: {
     if (!message) return;
 
     switch (message.type) {
+      case "disbanded":
+        phase = "disbanded";
+        reconnecting = false;
+        error = null;
+        errorKind = null;
+        stopTicking();
+        transport?.destroy();
+        transport = null;
+        break;
+
       case "welcome":
         name = message.name;
         roomName = message.roomName;

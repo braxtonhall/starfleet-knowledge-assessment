@@ -64,7 +64,9 @@ export function createHostTransport(
       peer = new PeerCtor(peerIdFor(roomCode));
 
       peer.on("open", () => handlers.onReady());
-      peer.on("error", (error) => handlers.onError(classify(error), error.message));
+      peer.on("error", (error) => {
+        if (!destroyed) handlers.onError(classify(error), error.message);
+      });
       // The broker dropping us costs nothing in-flight — established data
       // channels keep working — but without it no new player can join.
       peer.on("disconnected", () => {
@@ -90,7 +92,9 @@ export function createHostTransport(
         });
       });
     })
-    .catch((error: unknown) => handlers.onError("network", String(error)));
+    .catch((error: unknown) => {
+      if (!destroyed) handlers.onError("network", String(error));
+    });
 
   return {
     sendTo(channelId, message) {
@@ -143,17 +147,42 @@ export function createPlayerTransport(
       // guessable identity.
       peer = new PeerCtor();
 
-      peer.on("error", (error) => handlers.onError(classify(error), error.message));
+      peer.on("error", (error) => {
+        if (!destroyed) handlers.onError(classify(error), error.message);
+      });
       peer.on("open", () => {
         if (destroyed || !peer) return;
         connection = peer.connect(peerIdFor(roomCode), { reliable: true });
-        connection.on("open", () => handlers.onOpen());
-        connection.on("data", (data) => handlers.onMessage(data as HostMessage));
-        connection.on("close", () => handlers.onClose());
-        connection.on("error", () => handlers.onClose());
+        const current = connection;
+        let closed = false;
+        const notifyClose = () => {
+          if (destroyed || closed || connection !== current) return;
+          closed = true;
+          connection = null;
+          handlers.onClose();
+        };
+        current.on("open", () => {
+          if (destroyed || connection !== current) return;
+          handlers.onOpen();
+        });
+        current.on("data", (data) => {
+          if (!destroyed && connection === current) handlers.onMessage(data as HostMessage);
+        });
+        current.on("close", notifyClose);
+        current.on("error", notifyClose);
+      });
+      // A PeerJS signaling disconnect does not reliably close an already-open
+      // data channel. Surface it to the session so it can create a fresh peer
+      // and rejoin with the same clientId instead of waiting forever.
+      peer.on("disconnected", () => {
+        if (destroyed) return;
+        connection = null;
+        handlers.onClose();
       });
     })
-    .catch((error: unknown) => handlers.onError("network", String(error)));
+    .catch((error: unknown) => {
+      if (!destroyed) handlers.onError("network", String(error));
+    });
 
   return {
     send(message) {

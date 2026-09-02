@@ -166,6 +166,8 @@ export const copy = {
 
     // Failure states
     roomMissing: "NO VESSEL ANSWERS THAT DESIGNATION",
+    disbanded: "CREW DISBANDED",
+    disbandedDetail: "THE COMMANDING OFFICER HAS ENDED THIS DRILL",
     roomLocked: "THE DRILL IS UNDER WAY — NO LATE ARRIVALS",
     roomFull: "CREW COMPLEMENT IS FULL",
     versionMismatch: "INCOMPATIBLE TERMINAL VERSION",

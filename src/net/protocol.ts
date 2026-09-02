@@ -92,6 +92,7 @@ export type PlayerMessage =
 
 export type HostMessage =
   | { type: "welcome"; version: number; playerId: string; name: string; roomName: string }
+  | { type: "disbanded" }
   | { type: "rejected"; reason: RejectReason }
   | { type: "lobby"; roomName: string; roster: RosterEntry[] }
   | {
@@ -152,7 +153,7 @@ export function asPlayerMessage(value: unknown): PlayerMessage | null {
 
 export function asHostMessage(value: unknown): HostMessage | null {
   if (!isRecord(value)) return null;
-  const known = new Set(["welcome", "rejected", "lobby", "question", "reveal", "recap", "ping"]);
+  const known = new Set(["welcome", "disbanded", "rejected", "lobby", "question", "reveal", "recap", "ping"]);
   return known.has(value.type as string) ? (value as HostMessage) : null;
 }
 
